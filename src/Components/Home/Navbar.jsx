@@ -1,58 +1,36 @@
-import { useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
-import "../../tailwind.css"
-import Logo from "../../Assets/logo1.png"
+import { useState } from 'react';
+import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
+const Navbar = () => {
+  const [nav, setNav] = useState(false);
 
-export default function Navbar() {
+  const handleNav = () => {
+    setNav(!nav);
+  };
 
-    const [isSticky, setIsSticky] = useState(false);
+  return (
+    <div className='flex justify-between items-center h-24 max-w-[1240px] mx-auto px-4 text-white'>
+      <h1 className='w-full text-3xl font-bold text-[#00df9a]'>REACT.</h1>
+      <ul className='hidden md:flex'>
+        <li className='p-4'>Home</li>
+        <li className='p-4'>Company</li>
+        <li className='p-4'>Resources</li>
+        <li className='p-4'>About</li>
+        <li className='p-4'>Contact</li>
+      </ul>
+      <div onClick={handleNav} className='block md:hidden'>
+          {nav ? <AiOutlineClose size={20}/> : <AiOutlineMenu size={20} />}
+      </div>
+      <ul className={nav ? 'fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] ease-in-out duration-500' : 'ease-in-out duration-500 fixed left-[-100%]'}>
+        <h1 className='w-full text-3xl font-bold text-[#00df9a] m-4'>REACT.</h1>
+          <li className='p-4 border-b border-gray-600'>Home</li>
+          <li className='p-4 border-b border-gray-600'>Company</li>
+          <li className='p-4 border-b border-gray-600'>Resources</li>
+          <li className='p-4 border-b border-gray-600'>About</li>
+          <li className='p-4'>Contact</li>
+      </ul>
+    </div>
+  );
+};
 
-    const navItems = [
-        { link: "Overview", path: "home" },
-        { link: "Features", path: "feature" },
-        { link: "About", path: "about" },
-    ]
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (Window.scrollY > 100) {
-                setIsSticky(true);
-            } else {
-                setIsSticky(false);
-            }
-
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.addEventListener('scroll', handleScroll);
-
-        }
-    })
-
-    return (
-        <header className="w-full bg-white md:bg-transparent fixed top-0 left-0 right-0">
-            <nav className={'bg-white md:px-14 p-1 ${isSticky ? "sticky bg-white duration-300" : ""} max-w-screen-2xl mx-auto text-primary'}>
-                <div className="text-lg-container font-medium mx-auto flex justify-between items-center">
-                    <div className="flex space-x-14 items-center">
-                        <img src={Logo} className="flex justify-center items-center w-[7cm]" />
-                        <ul className="md:flex space-x-[3cm]">
-                            {
-                                navItems.map(({ link, path }) => <a key={link}
-                                    href={path} className="block hover:text-gray-300">{link}</a>)
-                            }
-                        </ul>
-                        <div className="space-x-[3cm] hidden md:flex items-center">
-                            <button className="active:scale-[.98] active:duration-75 hover:scale[1.01] ease-in-out transition-all py-2 px-3 rounded-xl bg-violet-500 text-white text-lg font-bold mr-"
-                                onClick={() => navigate('/login')}>
-                                Sign In
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </header>
-    )
-}
+export default Navbar;
