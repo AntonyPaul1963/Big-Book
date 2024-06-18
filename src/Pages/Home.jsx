@@ -1,13 +1,13 @@
-import Analytics from './components/Analytics';
-import Cards from './components/Cards';
-import Footer from './components/Footer';
-import Hero from './components/Hero';
-import Navbar from './components/Navbar';
-import Newsletter from './components/Newsletter';
+import Analytics from "../Components/Home/Analytics";
+import Cards from '../Components/Home/Cards';
+import Footer from '../Components/Home/Footer';
+import Hero from '../Components/Home/Hero';
+import Navbar from '../Components/Home/Navbar';
+import Newsletter from '../Components/Home/Newsletter';
 
 function App() {
   return (
-    <div>
+    <div className="bg-black">
       <Navbar />
       <Hero />
       <Analytics />
