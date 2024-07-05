@@ -11,13 +11,13 @@ const Sidebar = () => {
   return (
     <div className='w-screen h-screen flex'>
       <div className="h-screen w-1/20 bg-black text-white flex flex-col items-center">
-        <button className="p-4 m-2 mt-10 rounded hover:bg-gray-700" onClick={() => setVisible(0)}>
+        <button className="p-4 m-2 mt-10 rounded-xl hover:bg-gray-700" onClick={() => setVisible(0)}>
           <User size={32} />
         </button>
         <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(1)}>
           <Chats size={32} />
         </button>
-        <button className="p-4 m-2 rounded hover:bg-gray-700" onClick={() => setVisible(2)}>
+        <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(2)}>
           <Scroll size={32} />
         </button>
       </div>
