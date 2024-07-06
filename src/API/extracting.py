@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
@@ -8,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
+    "http://localhost:3000",  # React dev server
+    "http://localhost:5173",  # Vite dev server
 ]
 
 app.add_middleware(
@@ -24,7 +24,7 @@ class RequestModel(BaseModel):
     data: str
 
 class ResponseModel(BaseModel):
-    result: str 
+    result: str  # Changed to str to match the JSON string
 
 def formatting(keyword):
     return '+'.join(keyword.split())
@@ -47,7 +47,7 @@ def getResearch(keyword):
                     'author': td_tags[2].get_text(strip=True)
                 }
                 quotes.append(quote)
-    return json.dumps(quotes)
+    return json.dumps(quotes)  # Return the JSON string
 
 @app.post("/api/getResearch", response_model=ResponseModel)
 async def get_research(request: RequestModel):
