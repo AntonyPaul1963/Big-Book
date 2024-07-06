@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Scrollbars } from 'react-custom-scrollbars-2';
+import Skeleton from '@mui/material/Skeleton';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -25,13 +27,27 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
 
 const CustomTable = ({ data }) => {
+
+  const [loading, setLoading] = useState(true);
+  const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleCellClick = (url) => {
+    setUrl(url);
+  };
 
   return (
     <TableContainer
@@ -52,13 +68,47 @@ const CustomTable = ({ data }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
-              <StyledTableRow key={row[0]}>
-                <StyledTableCell align="center">{row[1]}</StyledTableCell>
-                <StyledTableCell align="center">{row[2]}</StyledTableCell>
-                <StyledTableCell align="center">{row[4]}</StyledTableCell>
-              </StyledTableRow>
-            ))}
+            {loading ? (
+              // Render skeleton loaders while loading
+              Array.from(new Array(5)).map((_, index) => (
+                <StyledTableRow key={index}>
+                  <StyledTableCell>
+                    <Skeleton animation="wave" />
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <Skeleton animation="wave" />
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <Skeleton animation="wave" />
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            ) : (
+              // Render actual data when loaded
+              data.map((row, index) => (
+                <StyledTableRow key={index}>
+                  <StyledTableCell align="center">{row[1]}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <a
+                      href={row[3]} // Assuming row[3] contains the URL to navigate to
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        transition: 'color 0.3s ease-in-out', // Smooth color transition
+                        '&:hover': {
+                          color: 'blue', // Change color to blue on hover
+                        },
+                      }}
+                      onClick={(e) => { e.preventDefault(); handleCellClick(row[3]); }}
+                    >
+                      {row[2]}
+                    </a>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">{row[4]}</StyledTableCell>
+                </StyledTableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Scrollbars>

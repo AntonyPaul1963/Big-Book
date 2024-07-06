@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
 import json
+import re
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -31,8 +32,9 @@ def formatting(keyword):
 
 def getResearch(keyword):
     index = 0
+    custom = "https://shodhganga.inflibnet.ac.in/handle/"
     new = formatting(keyword)
-    URL = "https://shodhganga.inflibnet.ac.in/browse?type=title&sort_by=1&order=ASC&rpp=20&etal=-1&starts_with=" + new
+    URL = "https://shodhganga.inflibnet.ac.in/browse?type=title&sort_by=1&order=ASC&rpp=50&etal=-1&starts_with=" + new
     r = requests.get(URL) 
     soup = BeautifulSoup(r.content, 'html5lib')
     quotes = []
@@ -47,6 +49,7 @@ def getResearch(keyword):
                     td_tags[1].get_text(strip=True), 
                     td_tags[1].a['href'], td_tags[2].get_text(strip=True)
                 ]
+                quote[3] = custom + re.search(r'(?:[^/]+/){2}(.+)', quote[3]).group(1)
                 quotes.append(quote)
                 index += 1
     return quotes
