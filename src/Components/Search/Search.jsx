@@ -47,7 +47,7 @@ function Search() {
         </Button>
       </Box>
 
-      {result && <div>Result: {result}</div>}
+      {result && <div>{result}</div>}
 
 
     </Box>
