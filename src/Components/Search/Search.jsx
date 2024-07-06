@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Typography, InputBase, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
+import CustomTable from './CustomTable';
 
 const CustomInputBase = styled(InputBase)({
   '& input': {
@@ -47,7 +48,7 @@ function Search() {
         </Button>
       </Box>
 
-      {result && <div>{result}</div>}
+      {result && <CustomTable data={result} />}
 
 
     </Box>

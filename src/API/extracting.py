@@ -24,12 +24,13 @@ class RequestModel(BaseModel):
     data: str
 
 class ResponseModel(BaseModel):
-    result: str  # Changed to str to match the JSON string
+    result: list
 
 def formatting(keyword):
     return '+'.join(keyword.split())
 
 def getResearch(keyword):
+    index = 0
     new = formatting(keyword)
     URL = "https://shodhganga.inflibnet.ac.in/browse?type=title&sort_by=1&order=ASC&rpp=20&etal=-1&starts_with=" + new
     r = requests.get(URL) 
@@ -40,14 +41,15 @@ def getResearch(keyword):
         for tr_tag in table.find_all('tr'):
             td_tags = tr_tag.find_all('td')
             if len(td_tags) == 4:
-                quote = {
-                    'upload': td_tags[0].get_text(strip=True),
-                    'txt': td_tags[1].get_text(strip=True),
-                    'url': td_tags[1].a['href'],
-                    'author': td_tags[2].get_text(strip=True)
-                }
+                quote = [
+                    index, 
+                    td_tags[0].get_text(strip=True), 
+                    td_tags[1].get_text(strip=True), 
+                    td_tags[1].a['href'], td_tags[2].get_text(strip=True)
+                ]
                 quotes.append(quote)
-    return json.dumps(quotes)  # Return the JSON string
+                index += 1
+    return quotes
 
 @app.post("/api/getResearch", response_model=ResponseModel)
 async def get_research(request: RequestModel):
