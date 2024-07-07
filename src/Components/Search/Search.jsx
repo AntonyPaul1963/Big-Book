@@ -44,6 +44,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function Search() {
   //This is the state that will store the text that the user types in the search bar
+  const [display, setDisplay] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [topics, setTopics] = useState(null);
 
@@ -51,12 +52,15 @@ function Search() {
   const [loading, setLoading] = useState(true);
   const [url, setUrl] = useState('');
 
+  const [papers, setPapers] = useState(null);
+
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
   };
 
   const handleCellClick = (url) => {
     setUrl(url);
+    setDisplay(false);
     setTopics(null);
   };
 
@@ -80,22 +84,26 @@ function Search() {
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
 
+      {display === true &&
+        <>
+          <Typography variant="h4" align="center">
+            Find your research Paper
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, width: { xs: '80%', sm: '60%', md: '45%' } }}>
+            <CustomInputBase
+              placeholder="Search"
+              inputProps={{ 'aria-label': 'search' }}
+              value={searchText}
+              onChange={handleInputChange}
+              sx={{ flex: 1, p: 1, borderRadius: 3, border: 1, borderColor: 'blue' }}
+            />
+            <Button variant="contained" color="primary" onClick={() => { callPythonFunction() }} sx={{ ml: 2 }}>
+              Search
+            </Button>
+          </Box>
+        </>
 
-      <Typography variant="h4" align="center">
-        Find your research Paper
-      </Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, width: { xs: '80%', sm: '60%', md: '45%' } }}>
-        <CustomInputBase
-          placeholder="Search"
-          inputProps={{ 'aria-label': 'search' }}
-          value={searchText}
-          onChange={handleInputChange}
-          sx={{ flex: 1, p: 1, borderRadius: 3, border: 1, borderColor: 'blue' }}
-        />
-        <Button variant="contained" color="primary" onClick={() => { callPythonFunction() }} sx={{ ml: 2 }}>
-          Search
-        </Button>
-      </Box>
+      }
 
       {topics &&
         <TableContainer
@@ -162,6 +170,8 @@ function Search() {
           </Scrollbars>
         </TableContainer>
       }
+
+      {}
 
 
     </Box>
