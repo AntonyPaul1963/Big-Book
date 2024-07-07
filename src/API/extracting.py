@@ -61,22 +61,33 @@ async def get_research(request: RequestModel):
 
 def getDetails(URL):
     r = requests.get(URL) 
-soup = BeautifulSoup(r.content, 'html5lib')
+    soup = BeautifulSoup(r.content, 'html5lib')
+    table = soup.find('table', attrs = {'class':'table itemDisplayTable'})  
+    details = []
+    if table:
+        td_tags = table.find_all('td', attrs = {'class':'metadataFieldValue'})
+        details = [
+            td_tags[0].get_text(strip=True),
+            td_tags[1].get_text(strip=True),
+            td_tags[2].get_text(strip=True),
+            td_tags[4].get_text(strip=True),
+            table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
+        ]
+        '''
+        quote['title'] = td_tags[0].get_text(strip=True)
+        quote['researcher'] = td_tags[1].get_text(strip=True)
+        quote['guides'] = td_tags[2].get_text(strip=True)
+        quote['university'] = td_tags[4].get_text(strip=True)
+        quote['completion date'] = td_tags[5].get_text(strip=True)
+        quote['dept'] = table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
+        '''
+        print(details)
+    return details
 
-quotes=[]
-files = []
-table = soup.find('table', attrs = {'class':'table itemDisplayTable'})  
-if table:
-    td_tags = table.find_all('td', attrs = {'class':'metadataFieldValue'})
-    quote = {}
-    quote['title'] = td_tags[0].get_text(strip=True)
-    quote['researcher'] = td_tags[1].get_text(strip=True)
-    quote['guides'] = td_tags[2].get_text(strip=True)
-    quote['university'] = td_tags[4].get_text(strip=True)
-    quote['completion date'] = td_tags[5].get_text(strip=True)
-    quote['dept'] = table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
-    quotes.append(quote)
-    print(quote)
+@app.post("/api/getDetails", response_model=ResponseModel)
+async def get_details(request: RequestModel):
+    details = getDetails(request.data)
+    return ResponseModel(result=details)
 
 def getFiles(URL):
     index = 0
@@ -107,8 +118,8 @@ def getFiles(URL):
     return files
 
 @app.post("/api/getFiles", response_model=ResponseModel)
-async def get_research(request: RequestModel):
-    files = getResearch(request.data)
+async def get_files(request: RequestModel):
+    files = getFiles(request.data)
     return ResponseModel(result=files)
 
 if __name__ == '__main__':
