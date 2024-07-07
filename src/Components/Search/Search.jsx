@@ -47,6 +47,8 @@ function Search() {
   const [display, setDisplay] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [topics, setTopics] = useState(null);
+  const [details, setDetails] = useState(null);
+  const [files, setFiles] = useState(null);
 
   //This function will be called when the user clicks the search button
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,8 @@ function Search() {
     setUrl(url);
     setDisplay(false);
     setTopics(null);
+    callPythonFunction2();
+    callPythonFunction3();
   };
 
   const callPythonFunction = async () => {
@@ -72,6 +76,26 @@ function Search() {
       console.error('Error calling the API', error);
     }
   };
+
+  const callPythonFunction2 = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/getDetails', { data: url });
+      setDetails(response.data.result);
+    } catch (error) {
+      console.error('Error calling the API', error);
+    }
+  };
+
+  const callPythonFunction3 = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/getFiles', { data: url });
+      setFiles(response.data.result);
+    } catch (error) {
+      console.error('Error calling the API', error);
+    }
+  };
+
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -171,7 +195,53 @@ function Search() {
         </TableContainer>
       }
 
-      {}
+      {
+        url &&
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxWidth: '85%',
+            margin: '2rem',
+            borderRadius: 4
+          }}
+        >
+          <Table sx={{ minWidth: 650, height: '500px' }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Research Paper Details</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <StyledTableRow>
+                <StyledTableCell align="center">Title</StyledTableCell>
+                <StyledTableCell align="center">{files[0]}</StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">Researcher</StyledTableCell>
+                <StyledTableCell align="center">{files[1]}</StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">Guides</StyledTableCell>
+                <StyledTableCell align="center">{files[2]}</StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">University</StyledTableCell>
+                <StyledTableCell align="center">{files[3]}</StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">Completion Date</StyledTableCell>
+                <StyledTableCell align="center">{files[4]}</StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">Department</StyledTableCell>
+                <StyledTableCell align="center">{files[5]}</StyledTableCell>
+              </StyledTableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+
+      }
 
 
     </Box>
