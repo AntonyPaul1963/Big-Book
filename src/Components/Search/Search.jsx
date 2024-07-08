@@ -270,5 +270,4 @@ function Search() {
     </Box>
   );
 }
-
 export default Search;

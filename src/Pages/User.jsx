@@ -1,10 +1,11 @@
-import { User, Chats, Scroll } from 'phosphor-react';
+import { User, Chats, Scroll, BookOpen } from 'phosphor-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ChatWindow from "../Components/Chatting/ChatWindow";
 import Dashboard from "../Components/Dashboard/Dashboard";
 import Search from "../Components/Search/Search";
 import logo from '../Assets/small-logo.png'; // Make sure to adjust the path to your logo
+import Summary from '../Components/Summary/Summary';
 
 const Sidebar = () => {
 
@@ -27,11 +28,15 @@ const Sidebar = () => {
         <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(2)}>
           <Scroll size={32} />
         </button>
+        <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(3)}>
+          <BookOpen size={32} />
+        </button>
       </div>
       <div className="h-screen w-19/20 bg-gray-100">
         {visible === 0 && <Dashboard />}
         {visible === 1 && <ChatWindow />}
         {visible === 2 && <Search />}
+        {visible === 3 && <Summary />}
       </div>
     </div>
   );
