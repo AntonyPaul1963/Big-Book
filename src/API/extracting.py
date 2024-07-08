@@ -101,7 +101,6 @@ def getDetails(URL: str) -> List:
             except Exception as e:
                 logging.error(f"Error extracting details from table: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
-    print(details)
     return details
 
 @app.post("/api/getDetails", response_model=ResponseModel)

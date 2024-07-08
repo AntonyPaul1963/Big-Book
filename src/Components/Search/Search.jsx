@@ -100,8 +100,7 @@ function Search() {
   };
 
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt : 3,}}>
-      <Scrollbars style={{ width: '100%', height: '500px' }} autoHide>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt : 3}}>
         {display === true && (
           <>
             <Typography variant="h4" align="center">
@@ -225,7 +224,7 @@ function Search() {
               <CircularProgress color="secondary" />
             ) : (
               files && (
-                <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4, maxHeight: '85%' }}>
+                <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4 }}>
                   <Table sx={{ minWidth: 650 }} aria-label="customized table">
                     <TableHead>
                       <TableRow>
@@ -249,8 +248,6 @@ function Search() {
             )}
           </Box>
         )}
-
-      </Scrollbars>
     </Box>
   );
 }
