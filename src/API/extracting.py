@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import requests
 from bs4 import BeautifulSoup
-import json
 import re
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
+import logging
 
 app = FastAPI()
 
@@ -27,71 +28,102 @@ class RequestModel(BaseModel):
 class ResponseModel(BaseModel):
     result: list
 
-def formatting(keyword):
+logging.basicConfig(level=logging.INFO)
+
+def formatting(keyword: str) -> str:
     return '+'.join(keyword.split())
 
-def getResearch(keyword):
+def getResearch(keyword: str) -> List:
     index = 0
     custom = "https://shodhganga.inflibnet.ac.in/handle/"
     new = formatting(keyword)
     URL = "https://shodhganga.inflibnet.ac.in/browse?type=title&sort_by=1&order=ASC&rpp=50&etal=-1&starts_with=" + new
-    r = requests.get(URL) 
+    try:
+        r = requests.get(URL)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"RequestException while fetching research: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
     soup = BeautifulSoup(r.content, 'html5lib')
     quotes = []
-    table = soup.find('table', attrs={'class': 'table'})  
+    table = soup.find('table', attrs={'class': 'table'})
     if table:
         for tr_tag in table.find_all('tr'):
             td_tags = tr_tag.find_all('td')
             if len(td_tags) == 4:
-                quote = [
-                    index, 
-                    td_tags[0].get_text(strip=True), 
-                    td_tags[1].get_text(strip=True), 
-                    td_tags[1].a['href'], td_tags[2].get_text(strip=True)
-                ]
-                quote[3] = custom + re.search(r'(?:[^/]+/){2}(.+)', quote[3]).group(1)
-                quotes.append(quote)
-                index += 1
+                try:
+                    quote = [
+                        index,
+                        td_tags[0].get_text(strip=True),
+                        td_tags[1].get_text(strip=True),
+                        custom + re.search(r'(?:[^/]+/){2}(.+)', td_tags[1].a['href']).group(1),
+                        td_tags[2].get_text(strip=True)
+                    ]
+                    quotes.append(quote)
+                    index += 1
+                except Exception as e:
+                    logging.error(f"Error processing table row: {e}")
     return quotes
 
 @app.post("/api/getResearch", response_model=ResponseModel)
 async def get_research(request: RequestModel):
-    result = getResearch(request.data)
-    return ResponseModel(result=result)
+    try:
+        result = getResearch(request.data)
+        return ResponseModel(result=result)
+    except Exception as e:
+        logging.error(f"Error in get_research endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-def getDetails(URL):
-    r = requests.get(URL) 
+def getDetails(URL: str) -> List:
+    try:
+        r = requests.get(URL)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"RequestException while fetching details: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
     soup = BeautifulSoup(r.content, 'html5lib')
-    table = soup.find('table', attrs = {'class':'table itemDisplayTable'})  
+    table = soup.find('table', attrs={'class': 'table itemDisplayTable'})
+    print(soup.prettify())
     details = []
     if table:
-        td_tags = table.find_all('td', attrs = {'class':'metadataFieldValue'})
-        details = [
-            td_tags[0].get_text(strip=True),
-            td_tags[1].get_text(strip=True),
-            td_tags[2].get_text(strip=True),
-            td_tags[4].get_text(strip=True),
-            table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
-        ]
-        '''
-        quote['title'] = td_tags[0].get_text(strip=True)
-        quote['researcher'] = td_tags[1].get_text(strip=True)
-        quote['guides'] = td_tags[2].get_text(strip=True)
-        quote['university'] = td_tags[4].get_text(strip=True)
-        quote['completion date'] = td_tags[5].get_text(strip=True)
-        quote['dept'] = table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
-        '''
-        print(details)
+        td_tags = table.find_all('td', attrs={'class': 'metadataFieldValue'})
+        if len(td_tags) >= 5:
+            try:
+                details = [
+                    td_tags[0].get_text(strip=True),
+                    td_tags[1].get_text(strip=True),
+                    td_tags[2].get_text(strip=True),
+                    td_tags[4].get_text(strip=True),
+                    table.find_all('tr')[-1].find_all('td')[-1].get_text(strip=True)
+                ]
+            except Exception as e:
+                logging.error(f"Error extracting details from table: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+    print(details)
     return details
+getResearch("biology")
+getDetails("https://shodhganga.inflibnet.ac.in/handle/10603/2754")
 
 @app.post("/api/getDetails", response_model=ResponseModel)
 async def get_details(request: RequestModel):
-    details = getDetails(request.data)
-    return ResponseModel(result=details)
+    try:
+        details = getDetails(request.data)
+        return ResponseModel(result=details)
+    except Exception as e:
+        logging.error(f"Error in get_details endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-def getFiles(URL):
+def getFiles(URL: str) -> List:
     index = 0
-    r = requests.get(URL)
+    try:
+        r = requests.get(URL)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"RequestException while fetching files: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
     soup = BeautifulSoup(r.content, 'html.parser')
     files = []
     table = soup.find('table', class_='table panel-body')
@@ -100,27 +132,27 @@ def getFiles(URL):
             td_tags = tr_tag.find_all('td', class_='standard')
             if td_tags:
                 try:
-                    title = td_tags[0].get_text(strip=True)
-                    size = td_tags[2].get_text(strip=True)
-                    link = td_tags[0].find('a')['href']
-                    
                     file = [
                         index,
                         td_tags[0].get_text(strip=True),
                         td_tags[2].get_text(strip=True),
-                        td_tags[0].find('a')['href']
+                        "https://shodhganga.inflibnet.ac.in/bitstream/" + re.search(r'(?:[^/]+/){2}(.+)', td_tags[0].find('a')['href']).group(1)
                     ]
-                    file[3] = "https://shodhganga.inflibnet.ac.in/bitstream/" + re.search(r'(?:[^/]+/){2}(.+)', file[3]).group(1)
                     files.append(file)
                     index += 1
                 except Exception as e:
-                    print(f"Error extracting data: {e}")
+                    logging.error(f"Error extracting file data from table row: {e}")
+    print(files)
     return files
 
 @app.post("/api/getFiles", response_model=ResponseModel)
 async def get_files(request: RequestModel):
-    files = getFiles(request.data)
-    return ResponseModel(result=files)
+    try:
+        files = getFiles(request.data)
+        return ResponseModel(result=files)
+    except Exception as e:
+        logging.error(f"Error in get_files endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == '__main__':
     import uvicorn

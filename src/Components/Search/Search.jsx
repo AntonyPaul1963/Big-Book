@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography, InputBase, Button } from '@mui/material';
 import axios from 'axios';
-import { useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,6 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import Skeleton from '@mui/material/Skeleton';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const CustomInputBase = styled(InputBase)({
   '& input': {
@@ -30,6 +30,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    wordBreak: 'break-word', // Allow words to break within the cell
+    whiteSpace: 'normal', // Allow text to wrap
   },
 }));
 
@@ -43,44 +45,45 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function Search() {
-  //This is the state that will store the text that the user types in the search bar
   const [display, setDisplay] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [topics, setTopics] = useState(null);
   const [details, setDetails] = useState(null);
   const [files, setFiles] = useState(null);
-
-  //This function will be called when the user clicks the search button
   const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState('');
-
-  const [papers, setPapers] = useState(null);
+  const [url, setUrl] = useState(null);
+  const [loading2, setLoading2] = useState(true);
+  const [loading3, setLoading3] = useState(true);
 
   const handleInputChange = (event) => {
     setSearchText(event.target.value);
   };
 
   const handleCellClick = (url) => {
+    console.log(url);
     setUrl(url);
     setDisplay(false);
     setTopics(null);
-    callPythonFunction2();
-    callPythonFunction3();
+    callPythonFunction2(url);
+    callPythonFunction3(url);
   };
 
   const callPythonFunction = async () => {
     try {
       const response = await axios.post('http://localhost:8000/api/getResearch', { data: searchText });
       setTopics(response.data.result);
+      console.log(response.data.result)
+      setLoading(false);
     } catch (error) {
       console.error('Error calling the API', error);
     }
   };
 
-  const callPythonFunction2 = async () => {
+  const callPythonFunction2 = async (url) => {
     try {
       const response = await axios.post('http://localhost:8000/api/getDetails', { data: url });
       setDetails(response.data.result);
+      setLoading2(false);
     } catch (error) {
       console.error('Error calling the API', error);
     }
@@ -90,25 +93,15 @@ function Search() {
     try {
       const response = await axios.post('http://localhost:8000/api/getFiles', { data: url });
       setFiles(response.data.result);
+      setLoading3(false);
     } catch (error) {
       console.error('Error calling the API', error);
     }
   };
 
-
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
-
-      {display === true &&
+      {display === true && (
         <>
           <Typography variant="h4" align="center">
             Find your research Paper
@@ -126,10 +119,9 @@ function Search() {
             </Button>
           </Box>
         </>
+      )}
 
-      }
-
-      {topics &&
+      {topics && (
         <TableContainer
           component={Paper}
           sx={{
@@ -164,26 +156,11 @@ function Search() {
                     </StyledTableRow>
                   ))
                 ) : (
-                  // Render actual data when loaded
-                  topics.map((row, index) => (
-                    <StyledTableRow key={index}>
+                  topics.map((row) => (
+                    <StyledTableRow key={row[0]}>
                       <StyledTableCell align="center">{row[1]}</StyledTableCell>
-                      <StyledTableCell align="center">
-                        <a
-                          href={row[3]} // Assuming row[3] contains the URL to navigate to
-                          style={{
-                            textDecoration: 'none',
-                            color: 'inherit',
-                            cursor: 'pointer',
-                            transition: 'color 0.3s ease-in-out', // Smooth color transition
-                            '&:hover': {
-                              color: 'blue', // Change color to blue on hover
-                            },
-                          }}
-                          onClick={(e) => { e.preventDefault(); handleCellClick(row[3]); }}
-                        >
-                          {row[2]}
-                        </a>
+                      <StyledTableCell align="center" onClick={() => handleCellClick(row[3])}>
+                        {row[2]}
                       </StyledTableCell>
                       <StyledTableCell align="center">{row[4]}</StyledTableCell>
                     </StyledTableRow>
@@ -193,57 +170,53 @@ function Search() {
             </Table>
           </Scrollbars>
         </TableContainer>
-      }
+      )}
 
-      {
-        url &&
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxWidth: '85%',
-            margin: '2rem',
-            borderRadius: 4
-          }}
-        >
-          <Table sx={{ minWidth: 650, height: '500px' }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Research Paper Details</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <StyledTableRow>
-                <StyledTableCell align="center">Title</StyledTableCell>
-                <StyledTableCell align="center">{files[0]}</StyledTableCell>
-              </StyledTableRow>
-              <StyledTableRow>
-                <StyledTableCell align="center">Researcher</StyledTableCell>
-                <StyledTableCell align="center">{files[1]}</StyledTableCell>
-              </StyledTableRow>
-              <StyledTableRow>
-                <StyledTableCell align="center">Guides</StyledTableCell>
-                <StyledTableCell align="center">{files[2]}</StyledTableCell>
-              </StyledTableRow>
-              <StyledTableRow>
-                <StyledTableCell align="center">University</StyledTableCell>
-                <StyledTableCell align="center">{files[3]}</StyledTableCell>
-              </StyledTableRow>
-              <StyledTableRow>
-                <StyledTableCell align="center">Completion Date</StyledTableCell>
-                <StyledTableCell align="center">{files[4]}</StyledTableCell>
-              </StyledTableRow>
-              <StyledTableRow>
-                <StyledTableCell align="center">Department</StyledTableCell>
-                <StyledTableCell align="center">{files[5]}</StyledTableCell>
-              </StyledTableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-
-      }
-
-
+      {url && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: "center" }}>
+          {loading2 ? (
+            <CircularProgress color="secondary" />
+          ) : (
+            url && (
+              <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4, overflow: "hidden" }}>
+                <Table sx={{ minWidth: 650 }} aria-label="customized table">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell colSpan={2} align="center">Paper Details</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">Title</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[0]}</StyledTableCell>
+                    </StyledTableRow>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">Authors</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[1]}</StyledTableCell>
+                    </StyledTableRow>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">Abstract</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[2]}</StyledTableCell>
+                    </StyledTableRow>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">Keywords</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[3]}</StyledTableCell>
+                    </StyledTableRow>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">Date</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[4]}</StyledTableCell>
+                    </StyledTableRow>
+                    <StyledTableRow>
+                      <StyledTableCell align="center">URL</StyledTableCell>
+                      <StyledTableCell align="center">{details && details[5]}</StyledTableCell>
+                    </StyledTableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )
+          )}
+        </Box>
+      )}
     </Box>
   );
 }
