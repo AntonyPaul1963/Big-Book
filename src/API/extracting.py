@@ -1,11 +1,16 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import requests
-from bs4 import BeautifulSoup
-import re
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import logging
+import requests
+from bs4 import BeautifulSoup
+import re
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+import time
 
 app = FastAPI()
 
@@ -26,7 +31,11 @@ class RequestModel(BaseModel):
     data: str
 
 class ResponseModel(BaseModel):
-    result: list
+    result: List
+
+class SeleniumRequest(BaseModel):
+    url: str
+    script: str
 
 logging.basicConfig(level=logging.INFO)
 
@@ -85,7 +94,6 @@ def getDetails(URL: str) -> List:
 
     soup = BeautifulSoup(r.content, 'html5lib')
     table = soup.find('table', attrs={'class': 'table itemDisplayTable'})
-    print(soup.prettify())
     details = []
     if table:
         td_tags = table.find_all('td', attrs={'class': 'metadataFieldValue'})
@@ -114,7 +122,6 @@ async def get_details(request: RequestModel):
 
 def getFiles(URL: str) -> List:
     index = 0
-    URL = str(URL)
     try:
         r = requests.get(URL)
         r.raise_for_status()
@@ -140,10 +147,7 @@ def getFiles(URL: str) -> List:
                     index += 1
                 except Exception as e:
                     logging.error(f"Error extracting file data from table row: {e}")
-    print(files)
     return files
-
-getFiles("https://shodhganga.inflibnet.ac.in/handle/10603/274")
 
 @app.post("/api/getFiles", response_model=ResponseModel)
 async def get_files(request: RequestModel):
@@ -154,6 +158,25 @@ async def get_files(request: RequestModel):
         logging.error(f"Error in get_files endpoint: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == '__main__':
+@app.post("/runSelenium")
+async def run_selenium(request: SeleniumRequest):
+    driver = webdriver.Chrome()
+
+    try:
+        driver.get(request.url)
+        driver.execute_script(request.script)
+        time.sleep(4)
+
+        return {"message": "Script executed successfully"}
+
+    except Exception as e:
+        logging.error(f"Error executing Selenium script: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    finally:
+        driver.quit()
+
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+

@@ -72,7 +72,7 @@ function Search() {
     try {
       const response = await axios.post('http://localhost:8000/api/getResearch', { data: searchText });
       setTopics(response.data.result);
-      console.log(response.data.result)
+      console.log(response.data.result);
       setLoading(false);
     } catch (error) {
       console.error('Error calling the API', error);
@@ -99,155 +99,174 @@ function Search() {
     }
   };
 
+  const openFile = async (file) => {
+    const url = 'http://localhost:8000/runSelenium';
+
+    const payload = {
+      url: file,
+      script: 'redirectPage(2)'
+    }
+    try {
+      const response = await axios.post(url, payload);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt : 3}}>
-        {display === true && (
-          <>
-            <Typography variant="h4" align="center">
-              Find your research Paper
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, width: { xs: '80%', sm: '60%', md: '45%' } }}>
-              <CustomInputBase
-                placeholder="Search"
-                inputProps={{ 'aria-label': 'search' }}
-                value={searchText}
-                onChange={handleInputChange}
-                sx={{ flex: 1, p: 1, borderRadius: 3, border: 1, borderColor: 'blue' }}
-              />
-              <Button variant="contained" color="primary" onClick={() => { callPythonFunction() }} sx={{ ml: 2 }}>
-                Search
-              </Button>
-            </Box>
-          </>
-        )}
-
-        {topics && (
-          <TableContainer
-            component={Paper}
-            sx={{
-              maxWidth: '85%',
-              margin: '2rem',
-              borderRadius: 4
-            }}
-          >
-            <Scrollbars style={{ width: '100%', height: '500px' }} autoHide>
-              <Table sx={{ minWidth: 650, height: '500px' }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Upload Date</StyledTableCell>
-                    <StyledTableCell align="center">Title</StyledTableCell>
-                    <StyledTableCell align="center">Researcher</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loading ? (
-                    // Render skeleton loaders while loading
-                    Array.from(new Array(5)).map((_, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell>
-                          <Skeleton animation="wave" />
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          <Skeleton animation="wave" />
-                        </StyledTableCell>
-                        <StyledTableCell>
-                          <Skeleton animation="wave" />
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    ))
-                  ) : (
-                    topics.map((row) => (
-                      <StyledTableRow key={row[0]}>
-                        <StyledTableCell align="center">{row[1]}</StyledTableCell>
-                        <StyledTableCell align="center" onClick={() => handleCellClick(row[3])}>
-                          {row[2]}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">{row[4]}</StyledTableCell>
-                      </StyledTableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Scrollbars>
-          </TableContainer>
-        )}
-
-        {url && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: "center" }}>
-            {loading2 ? (
-              <CircularProgress color="secondary" />
-            ) : (
-              url && (
-                <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4, overflow: "hidden" }}>
-                  <Table sx={{ minWidth: 650 }} aria-label="customized table">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell colSpan={2} align="center">Paper Details</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">Title</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[0]}</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">Authors</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[1]}</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">Abstract</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[2]}</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">Keywords</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[3]}</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">Date</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[4]}</StyledTableCell>
-                      </StyledTableRow>
-                      <StyledTableRow>
-                        <StyledTableCell align="center">URL</StyledTableCell>
-                        <StyledTableCell align="center">{details && details[5]}</StyledTableCell>
-                      </StyledTableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )
-            )}
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
+      {display === true && (
+        <>
+          <Typography variant="h4" align="center">
+            Find your research Paper
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, width: { xs: '80%', sm: '60%', md: '45%' } }}>
+            <CustomInputBase
+              placeholder="Search"
+              inputProps={{ 'aria-label': 'search' }}
+              value={searchText}
+              onChange={handleInputChange}
+              sx={{ flex: 1, p: 1, borderRadius: 3, border: 1, borderColor: 'blue' }}
+            />
+            <Button variant="contained" color="primary" onClick={callPythonFunction} sx={{ ml: 2 }}>
+              Search
+            </Button>
           </Box>
-        )}
+        </>
+      )}
 
-        {url && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: "center" }}>
-            {loading3 ? (
-              <CircularProgress color="secondary" />
-            ) : (
-              files && (
-                <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4 }}>
-                  <Table sx={{ minWidth: 650 }} aria-label="customized table">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell align="center">Title</StyledTableCell>
-                        <StyledTableCell align="center">Size</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {files.map((row) => (
-                        <StyledTableRow key={row[0]}>
-                          <StyledTableCell align="center">{row[1]}</StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row[2]}
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )
+      {topics && (
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxWidth: '85%',
+            margin: '2rem',
+            borderRadius: 4,
+            flexGrow: 1 // Make the table container grow to fill the available space
+          }}
+        >
+          <Scrollbars style={{ width: '100%', height: '500px' }} autoHide>
+            <Table sx={{ minWidth: 650 }} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Upload Date</StyledTableCell>
+                  <StyledTableCell align="center">Title</StyledTableCell>
+                  <StyledTableCell align="center">Researcher</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  // Render skeleton loaders while loading
+                  Array.from(new Array(5)).map((_, index) => (
+                    <StyledTableRow key={index}>
+                      <StyledTableCell>
+                        <Skeleton animation="wave" />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Skeleton animation="wave" />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Skeleton animation="wave" />
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))
+                ) : (
+                  topics.map((row) => (
+                    <StyledTableRow key={row[0]}>
+                      <StyledTableCell align="center">{row[1]}</StyledTableCell>
+                      <StyledTableCell align="center" onClick={() => handleCellClick(row[3])}>
+                        {row[2]}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">{row[4]}</StyledTableCell>
+                    </StyledTableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Scrollbars>
+        </TableContainer>
+      )}
+
+      {url && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', mt: 3, mb: 3, height: '100%', flexGrow: 1 }}>
+          <Scrollbars style={{ width: '100%', height: '100%' }} autoHide>
+            {url && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: 'center' }}>
+                {loading2 ? (
+                  <CircularProgress color="secondary" />
+                ) : (
+                  url && (
+                    <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4, overflow: 'hidden', flexGrow: 1 }}>
+                      <Table sx={{ minWidth: 650 }} aria-label="customized table">
+                        <TableHead>
+                          <TableRow>
+                            <StyledTableCell colSpan={2} align="center">Paper Details</StyledTableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">Title</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[0]}</StyledTableCell>
+                          </StyledTableRow>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">Authors</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[1]}</StyledTableCell>
+                          </StyledTableRow>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">Abstract</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[2]}</StyledTableCell>
+                          </StyledTableRow>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">Keywords</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[3]}</StyledTableCell>
+                          </StyledTableRow>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">Date</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[4]}</StyledTableCell>
+                          </StyledTableRow>
+                          <StyledTableRow>
+                            <StyledTableCell align="center">URL</StyledTableCell>
+                            <StyledTableCell align="center">{details && details[5]}</StyledTableCell>
+                          </StyledTableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )
+                )}
+              </Box>
             )}
-          </Box>
-        )}
+
+            {url && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: 'center' }}>
+                {loading3 ? (
+                  <CircularProgress color="secondary" />
+                ) : (
+                  files && (
+                    <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4, flexGrow: 1 }}>
+                      <Table sx={{ minWidth: 650 }} aria-label="customized table">
+                        <TableHead>
+                          <TableRow>
+                            <StyledTableCell align="center">Title</StyledTableCell>
+                            <StyledTableCell align="center">Size</StyledTableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {files.map((row) => (
+                            <StyledTableRow key={row[0]}>
+                              <StyledTableCell align="center" onClick={() => openFile(row[3])}>{row[1]}</StyledTableCell>
+                              <StyledTableCell align="center">{row[2]}</StyledTableCell>
+                            </StyledTableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )
+                )}
+              </Box>
+            )}
+          </Scrollbars>
+        </Box>
+      )}
     </Box>
   );
 }
