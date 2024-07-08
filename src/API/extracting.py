@@ -165,7 +165,7 @@ async def run_selenium(request: SeleniumRequest):
     try:
         driver.get(request.url)
         driver.execute_script(request.script)
-        time.sleep(4)
+        time.sleep(40)
 
         return {"message": "Script executed successfully"}
 
