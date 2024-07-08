@@ -89,7 +89,7 @@ function Search() {
     }
   };
 
-  const callPythonFunction3 = async () => {
+  const callPythonFunction3 = async (url) => {
     try {
       const response = await axios.post('http://localhost:8000/api/getFiles', { data: url });
       setFiles(response.data.result);
@@ -100,7 +100,7 @@ function Search() {
   };
 
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3 }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
       {display === true && (
         <>
           <Typography variant="h4" align="center">
@@ -217,6 +217,39 @@ function Search() {
           )}
         </Box>
       )}
+
+      {url && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, alignSelf: "center" }}>
+          {loading3 ? (
+            <CircularProgress color="secondary" />
+          ) : (
+            files && (
+              <TableContainer component={Paper} sx={{ maxWidth: '85%', margin: '2rem', borderRadius: 4}}>
+                <Table sx={{ minWidth: 650 }} aria-label="customized table">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell align="center">Title</StyledTableCell>
+                      <StyledTableCell align="center">Size</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {files.map((row) => (
+                      <StyledTableRow key={row[0]}>
+                        <StyledTableCell align="center">{row[1]}</StyledTableCell>
+                        <StyledTableCell align="center">
+                          {row[2]}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )
+          )}
+        </Box>
+      )}
+
+
     </Box>
   );
 }

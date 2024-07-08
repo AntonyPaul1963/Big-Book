@@ -103,8 +103,6 @@ def getDetails(URL: str) -> List:
                 raise HTTPException(status_code=500, detail=str(e))
     print(details)
     return details
-getResearch("biology")
-getDetails("https://shodhganga.inflibnet.ac.in/handle/10603/2754")
 
 @app.post("/api/getDetails", response_model=ResponseModel)
 async def get_details(request: RequestModel):
@@ -117,6 +115,7 @@ async def get_details(request: RequestModel):
 
 def getFiles(URL: str) -> List:
     index = 0
+    URL = str(URL)
     try:
         r = requests.get(URL)
         r.raise_for_status()
@@ -144,6 +143,8 @@ def getFiles(URL: str) -> List:
                     logging.error(f"Error extracting file data from table row: {e}")
     print(files)
     return files
+
+getFiles("https://shodhganga.inflibnet.ac.in/handle/10603/274")
 
 @app.post("/api/getFiles", response_model=ResponseModel)
 async def get_files(request: RequestModel):
