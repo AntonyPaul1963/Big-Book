@@ -213,20 +213,16 @@ function Search() {
                             <StyledTableCell align="center">{details && details[1]}</StyledTableCell>
                           </StyledTableRow>
                           <StyledTableRow>
-                            <StyledTableCell align="center">Abstract</StyledTableCell>
+                            <StyledTableCell align="center">Guides</StyledTableCell>
                             <StyledTableCell align="center">{details && details[2]}</StyledTableCell>
                           </StyledTableRow>
                           <StyledTableRow>
-                            <StyledTableCell align="center">Keywords</StyledTableCell>
+                            <StyledTableCell align="center">University</StyledTableCell>
                             <StyledTableCell align="center">{details && details[3]}</StyledTableCell>
                           </StyledTableRow>
                           <StyledTableRow>
-                            <StyledTableCell align="center">Date</StyledTableCell>
+                            <StyledTableCell align="center">Department</StyledTableCell>
                             <StyledTableCell align="center">{details && details[4]}</StyledTableCell>
-                          </StyledTableRow>
-                          <StyledTableRow>
-                            <StyledTableCell align="center">URL</StyledTableCell>
-                            <StyledTableCell align="center">{details && details[5]}</StyledTableCell>
                           </StyledTableRow>
                         </TableBody>
                       </Table>

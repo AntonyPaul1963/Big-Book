@@ -42,7 +42,7 @@ const ChatBot = () => {
     return (
         <Box sx={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem', backgroundColor: '#f4f4f4' }}>
             <Typography variant="h4" align="center" sx={{ marginBottom: '1rem' }}>
-                Placement Trainer Chatbot
+                ChatBook - Your Personal Chatbot
             </Typography>
             <Scrollbars ref={scrollbarsRef} autoHide style={{ width: '100%', height: '70vh', backgroundColor: '#fff', borderRadius: '8px', padding: '1rem' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

@@ -17,7 +17,7 @@ import io
 
 app = FastAPI()
 model = genai.GenerativeModel("gemini-pro")
-GOOGLE_API_KEY = "APi_KEY"
+GOOGLE_API_KEY = "API_KEY"
 genai.configure(api_key=GOOGLE_API_KEY)
 chat = model.start_chat(history=[])
 
