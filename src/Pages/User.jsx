@@ -1,11 +1,11 @@
-import { User, Chats, Scroll, BookOpen } from 'phosphor-react';
+import { Scroll, BookOpen } from 'phosphor-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ChatWindow from "../Components/Chatting/ChatWindow";
-import Dashboard from "../Components/Dashboard/Dashboard";
 import Search from "../Components/Search/Search";
-import logo from '../Assets/small-logo.png'; // Make sure to adjust the path to your logo
+import logo from '../Assets/small-logo.png';
+import botIcon from '../Assets/bot-svgrepo-com.svg';
 import Summary from '../Components/Summary/Summary';
+import ChatBot from '../Components/ChatBot/ChatBot';
 
 const Sidebar = () => {
 
@@ -19,24 +19,20 @@ const Sidebar = () => {
             <img src={logo} alt="Logo" className="p-4 m-2 rounded-xl hover:bg-gray-700" />
           </Link>
         </div>
-        <button className="p-4 m-2 mt-10 rounded-xl hover:bg-gray-700" onClick={() => setVisible(0)}>
-          <User size={32} />
-        </button>
-        <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(1)}>
-          <Chats size={32} />
-        </button>
         <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(2)}>
           <Scroll size={32} />
         </button>
         <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(3)}>
           <BookOpen size={32} />
         </button>
+        <button className="p-4 m-2 rounded-xl hover:bg-gray-700" onClick={() => setVisible(4)}>
+          <img src={botIcon} alt="Bot" className="w-8 h-8" />
+        </button>
       </div>
       <div className="h-screen w-19/20 bg-gray-100">
-        {visible === 0 && <Dashboard />}
-        {visible === 1 && <ChatWindow />}
         {visible === 2 && <Search />}
         {visible === 3 && <Summary />}
+        {visible === 4 && <ChatBot />}
       </div>
     </div>
   );

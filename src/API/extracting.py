@@ -17,7 +17,7 @@ import io
 
 app = FastAPI()
 model = genai.GenerativeModel("gemini-pro")
-GOOGLE_API_KEY = "MY-KEY"
+GOOGLE_API_KEY = "APi_KEY"
 genai.configure(api_key=GOOGLE_API_KEY)
 chat = model.start_chat(history=[])
 
@@ -214,6 +214,15 @@ async def api_get_pdf_summary(file: UploadFile = File(...)):
         return StringResponse(result=summary)
     except Exception as e:
         print(f"Error in /api/getPdfSummary: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
+@app.post("/api/getGeminiResponse", response_model=StringResponse)
+async def api_get_gemini_response(request: RequestModel):
+    try:
+        result = get_gemini_response(request.data)
+        return StringResponse(result=result)
+    except Exception as e:
+        print(f"Error in /api/getGeminiResponse: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 if __name__ == "__main__":
